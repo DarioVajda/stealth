@@ -1,0 +1,19 @@
+node_modules
+
+smart_contracts/node_modules
+smart_contracts/.env
+
+# Hardhat files
+smart_contracts/cache
+smart_contracts/artifacts
+
+# TypeChain files
+smart_contracts/typechain
+smart_contracts/typechain-types
+
+# solidity-coverage files
+smart_contracts/coverage
+smart_contracts/coverage.json
+
+# Hardhat Ignition default folder for deployments against a local node
+smart_contracts/ignition/deployments/chain-31337
