@@ -22,15 +22,20 @@ describe("StealthAddress", function () {
     // defining the arguments for the test
     const amount = '1200000000000000000'; // 1.2 ether
     const addr = '0xae4cee3b469acdcfcc104df565dcdc78e625f15b';
+    const dummyKey ='0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319'; 
 
     // sending the ether to the stealth address
     await stealthContract.sendEthToStealthAddr(
-      '0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319',
+      dummyKey,
       addr,
       { value: amount }
     );
 
-    // TODO check if the EphPubKey was published
+    // check if the EphPubKey was published
+    const ephPubKeys = await stealthContract.getAllEphPubKeys();
+    ephPubKeys.forEach(element => {
+      expect(element).to.equal(dummyKey);
+    });
 
     // checking the balance of the stealth address
     const balance = await ethers.provider.getBalance(addr);
@@ -47,6 +52,7 @@ describe("StealthAddress", function () {
     // defining the arguments for the test
     const amount = '1200000000000000000'; // 1.2 ether
     const addr = '0xae4cee3b469acdcfcc104df565dcdc78e625f15b';
+    const dummyKey = '0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319';
 
     // minting new tokens for the sender (for test purpoces)
     await tokenContract.mint(sender.address, amount);
@@ -55,13 +61,17 @@ describe("StealthAddress", function () {
     
     // sending the given token to stealth address
     await stealthContract.sendTokenToStealthAddr(
-      '0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319',
+      dummyKey,
       addr,
       tokenContractAddr,
       amount
     );
 
-    // TODO check if the EphPubKey was published
+    // check if the EphPubKey was published
+    const ephPubKeys = await stealthContract.getAllEphPubKeys();
+    ephPubKeys.forEach(element => {
+      expect(element).to.equal(dummyKey);
+    });
 
     // checking the balance of the stealth address
     const tokenBalance = await tokenContract.balanceOf(addr);
