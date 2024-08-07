@@ -43,14 +43,14 @@ function generateMetaAddressKeys(signature) {
 async function generateMetaStealthAddr(k, v) {
     // generating private and public spending keys
     // let k = secp.utils.randomPrivateKey(); // this should be changed later (to use signatures)
-    let K = secp.getPublicKey(k);
+    let K = secp.getPublicKey(k.substring(2));
 
     // generating private and public viewing keys
     // let v = secp.utils.randomPrivateKey(); // this should be changed later (to use signatures)
-    let V = secp.getPublicKey(v);
+    let V = secp.getPublicKey(v.substring(2));
 
 
-    console.log({ k, v, K, V});
+    console.log({ k, v, K, V });
     console.log({ K: uint8ArrayToHex(K), V: uint8ArrayToHex(V), k: uint8ArrayToHex(k), v: uint8ArrayToHex(v) });
 
 
@@ -135,6 +135,14 @@ async function sendStealth(v, k, value, tokenAddr) {
     console.log("Receipt: ", receipt);
 }
 
+async function fetchPublicKeys(address) {
+    // fetch the public keys from the contract
+    return {
+        V: '0x...',
+        K: '0x...'
+    };
+}
+
 async function calculatePrivateKey(R, v, k) {
     const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
     
@@ -161,4 +169,4 @@ async function calculatePrivateKey(R, v, k) {
 // secp.getSharedSecret(r, alicesPubkey);
 
 
-export { generateMetaStealthAddr, sendStealth, calculatePrivateKey, generateMetaAddressKeys };
+export { generateMetaStealthAddr, sendStealth, calculatePrivateKey, generateMetaAddressKeys, fetchPublicKeys };

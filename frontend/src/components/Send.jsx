@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 
 import { Link } from 'react-router-dom'
 import NavBar from './NavBar'
-import { sendStealth, generateMetaAddressKeys } from '../logic/logic'
+import { sendStealth, fetchPublicKeys } from '../logic/logic'
 
 import styles from './send.module.css'
 
@@ -23,8 +23,8 @@ const Send = ({ signature, setSignature }) => {
 
   const performSend = () => {
     console.log("performSend")
-    let { v, k } = generateMetaAddressKeys(signature);
-    console.log({v, k});
+
+    let { V, K } = fetchPublicKeys(to);
     sendStealth(v, k, amount, token)
   }
 
