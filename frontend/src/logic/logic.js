@@ -79,12 +79,12 @@ async function generateMetaStealthAddr(k, v) {
  * @param {Int} value value of the token to be sent
  * @param {Address} tokenAddr 0 for ether and the address of the token for ERC20 tokens otherwise
  */
-async function sendStealth(v, k, value, tokenAddr) {
+async function sendStealth(V, K, value, tokenAddr) {
     const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
 
 
-    let V = secp.getPublicKey(v);
-    let K = secp.getPublicKey(k);
+    V = V.substring(2);
+    K = K.substring(2);
     // generating the ephemeral key
     let r = secp.utils.randomPrivateKey(); // this might be changed later (maybe not)
     let R = secp.getPublicKey(r);
@@ -110,18 +110,20 @@ async function sendStealth(v, k, value, tokenAddr) {
     let stealthAddr = '0x' + P_hex.slice(0, 40);
     console.log({ stealthAddr });
 
-
-
     // TODO make sure the code below works
     let provider = new ethers.BrowserProvider(window.ethereum);
+    let signer = await provider.getSigner(0);
+
     let stealthContract = new ethers.Contract(
-        '0x...', // address of the contract to be added later
-        'smartContract.Abi', // the ABI of the smart contract
-        provider.getSigner(0)
+        '0x2ca6D993651d967a00d494D8d059b14AFD895Aa2', // address of the contract
+        contractAbi,                                  // the ABI of the smart contract
+        signer 
     );
+    console.log("Connected to smart contract");
 
     let tx;
-    if(tokenAddr === 0) {
+    console.log(tokenAddr == 0);
+    if(tokenAddr == 0) {
         tx = await stealthContract.sendEthToStealthAddr(R, stealthAddr, { value: value }); // calling the function of the contract
     }
     else {
@@ -145,11 +147,10 @@ async function fetchPublicKeys(address) {
     );
 
     let metaAddress = await stealthContract.findMetaAddress(address);
-    console.log(metaAddress);
 
     return {
-        V: '0x...',
-        K: '0x...'
+        K: metaAddress[0],
+        V: metaAddress[1]
     };
 }
 
