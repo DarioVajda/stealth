@@ -13,7 +13,7 @@ contract StealthAddress {
 
     uint ephCounter;
 
-    mapping(uint256 => uint256) public ephPubKeyRegistry;
+    mapping(uint256 => uint256) ephPubKeyRegistry;
     mapping(address => MetaAddress) metaAddressRegistry;
     
     error StealthAddress__BadBaseAddress();
@@ -22,6 +22,7 @@ contract StealthAddress {
     error StealthAddress__FailedRecievingToken();
     error StealthAddress__FailedSendingEth();
 
+    // function for registering a meta address in meta address registry
     function registerMetaAddress(MetaAddress calldata metaAddress) public {
         metaAddressRegistry[msg.sender] = metaAddress;
         
@@ -34,6 +35,7 @@ contract StealthAddress {
         metaAddressRegistry[msg.sender] = metaAddress;
     }
 
+    // function for finding meta address given an existing ETH address
     function findMetaAddress(address baseAddress) public view returns (MetaAddress memory) {
         if (metaAddressRegistry[baseAddress].publicSpendingKey == 0 && metaAddressRegistry[baseAddress].publicViewingKey == 0) {
             revert StealthAddress__BadBaseAddress();
@@ -47,7 +49,7 @@ contract StealthAddress {
         return metaAddressRegistry[baseAddress];
     }
 
-    //function that sets publick key addresses in array (the function is internal because it will be used by sendEthToStealthAddr and sendTokenToStealthAddr)
+    // function that adds ephemeral pubkey to the registry
     function publishEphPubKey(uint256 publicKey) internal {
         if (publicKey == 0) {
             revert StealthAddress__BadPublicKey();
@@ -55,7 +57,7 @@ contract StealthAddress {
         ephPubKeyRegistry[ephCounter++] = publicKey;
     }
     
-    //fucntion that prints all publick key addresses in array
+    // fucntion that returns all ephemeral pubkeys found in the registry
     function getAllEphPubKeys() public view returns(uint256[] memory){
         uint256[] memory allEPH = new uint256[](ephCounter);
         for(uint i = 0; i < ephCounter; i++){
