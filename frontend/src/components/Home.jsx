@@ -1,11 +1,19 @@
 import React from 'react'
 
 import NavBar from './NavBar'
-import { generateMetaStealthAddr } from '../logic/logic'
+import { generateMetaStealthAddr, generateMetaAddressKeys } from '../logic/logic'
 
 import styles from './home.module.css'
 
 const Home = ({ signature, setSignature }) => {
+
+  const generate = async () => {
+    console.log("performGenerating");
+    let { v, k } = generateMetaAddressKeys(signature);
+    console.log({v, k});
+    generateMetaStealthAddr(v, k, amount, token)
+  }
+
   return (
     <div>
       <NavBar signature={signature} setSignature={setSignature} />

@@ -8,15 +8,15 @@ import Scan from './components/Scan';
 
 function App() {
 
-  const [ signature, setSignature ] = useState(null);
+  const [ signature, setSignature ] = useState('signature_initial');
 
   return (
     <BrowserRouter>
       {/* Your application code goes here */}
       <Routes>
-        <Route exact path="/" component={<Home signature={signature} setSignature={setSignature} />} />
-        <Route path="/send" component={<Send signature={signature} setSignature={setSignature} />} />
-        <Route path="/scan" component={<Scan signature={signature} setSignature={setSignature} />} />
+        <Route exact path="/" element={<Home signature={signature} setSignature={setSignature} />} />
+        <Route path="/send" element={<Send signature={signature} setSignature={setSignature} />} />
+        <Route path="/scan" element={<Scan signature={signature} setSignature={setSignature} />} />
       </Routes>
     </BrowserRouter>
   );

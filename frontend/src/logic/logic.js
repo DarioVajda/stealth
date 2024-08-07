@@ -10,21 +10,51 @@ function uint8ArrayToHex(uint8Array) {
         .join('');
 }
 
-async function generateMetaStealthAddr() {
+function generateMetaAddressKeys(signature) {
+    const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
+
+    // removing the 0x from the beginning
+    signature = signature.substring(2)
+
+    // splitting the signature into two seeds
+    let seed_k = signature.substring(0, 49);
+    let seed_v = signature.substring(49, 98);
+    
+    // hashing the seeds
+    let hash_k = ethers.sha256(secp.etc.hexToBytes(seed_k + seed_v)).substring(2);
+    let hash_v = ethers.sha256(secp.etc.hexToBytes(seed_v + seed_k)).substring(2);
+
+    // convert hash_k and hash_v to bigint
+    let k_num = secp.etc.bytesToNumberBE(secp.etc.hexToBytes(hash_k));
+    let v_num = secp.etc.bytesToNumberBE(secp.etc.hexToBytes(hash_v));
+
+    // calculate the private keys by taking the modulo of the sum of the two numbers with N
+    let k = uint8ArrayToHex(secp.etc.numberToBytesBE(secp.etc.mod(k_num, N)));
+    let v = uint8ArrayToHex(secp.etc.numberToBytesBE(secp.etc.mod(v_num, N)));
+
+    return { k, v };
+}
+
+/**
+ * 
+ * @param {String} k private spending key
+ * @param {String} v private viewing key
+ */
+async function generateMetaStealthAddr(k, v) {
     // generating private and public spending keys
-    let k = secp.utils.randomPrivateKey(); // this should be changed later (to use signatures)
+    // let k = secp.utils.randomPrivateKey(); // this should be changed later (to use signatures)
     let K = secp.getPublicKey(k);
 
     // generating private and public viewing keys
-    let v = secp.utils.randomPrivateKey(); // this should be changed later (to use signatures)
+    // let v = secp.utils.randomPrivateKey(); // this should be changed later (to use signatures)
     let V = secp.getPublicKey(v);
 
 
-    console.log({K, V});
-    console.log({ K: uint8ArrayToHex(K), V: uint8ArrayToHex(V) });
-    // return { K, V };
+    console.log({ k, v, K, V});
+    console.log({ K: uint8ArrayToHex(K), V: uint8ArrayToHex(V), k: uint8ArrayToHex(k), v: uint8ArrayToHex(v) });
 
 
+    // TODO make sure the code below works
     // implement calling the contract to publish the meta-stealth address
     let provider = new ethers.BrowserProvider(window.ethereum);
     let signer = await provider.getSigner(0);
@@ -35,10 +65,9 @@ async function generateMetaStealthAddr() {
         signer
     );
 
-    // TODO promeniti argumente u smart contractu da ne bude struktura nego posebno brojevi, a onda tamo da se napravi struktura
     const tx = await stealthContract.registerMetaAddress({
-        publicSpendingKey: "0x034c863d4641925a7e56192cc9cca73df9225fe07efd2f038e3a76e4fe818e9369",
-        publicViewingKey: "0x023e16f66bd047e0ba4b090d3782b3051ba0eb0cd77a03ba4ca88573b001d3718b",
+        publicSpendingKey: uint8ArrayToHex(K),
+        publicViewingKey: uint8ArrayToHex(V),
     }); // calling the function of the contract
 
     console.log("Transaction hash: ", tx.hash);
@@ -46,31 +75,47 @@ async function generateMetaStealthAddr() {
     console.log("Receipt: ", receipt);
 }
 
-async function sendStealth(V, K, value, tokenAddr) {
+/**
+ * 
+ * @param {String} v private viewing key
+ * @param {String} k private spending key
+ * @param {Int} value value of the token to be sent
+ * @param {Address} tokenAddr 0 for ether and the address of the token for ERC20 tokens otherwise
+ */
+async function sendStealth(v, k, value, tokenAddr) {
+    const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
+
+
+    let V = secp.getPublicKey(v);
+    let K = secp.getPublicKey(k);
     // generating the ephemeral key
     let r = secp.utils.randomPrivateKey(); // this might be changed later (maybe not)
     let R = secp.getPublicKey(r);
 
+    
     // generating the shared secret
     let S = secp.getSharedSecret(r, V);
 
     // generating the stealth address
     let hashS = ethers.sha256(S).substring(2);
-    let G_hashS_Hex = secp.getPublicKey(hashS);
+    console.log({hashS})
+    
+    let hashSNum = secp.etc.mod(secp.etc.bytesToNumberBE(hashS), N)
+    hashSNum = uint8ArrayToHex(secp.etc.numberToBytesBE(hashSNum)).substring(2)
+
+    let G_hashS_Hex = secp.getPublicKey(hashSNum);
     let G_hashS = secp.ProjectivePoint.fromHex(G_hashS_Hex);
     let K_point = secp.ProjectivePoint.fromHex(K);
     let P_point = G_hashS.add(K_point);
     let P_hex = P_point.toHex();
-    // console.log({ P_hex });
+    console.log({ P_hex });
 
     let stealthAddr = '0x' + P_hex.slice(0, 40);
-    console.log({ stealthAddr: stealthAddr });
-
-    return;
+    console.log({ stealthAddr });
 
 
-    
 
+    // TODO make sure the code below works
     let provider = new ethers.BrowserProvider(window.ethereum);
     let stealthContract = new ethers.Contract(
         '0x...', // address of the contract to be added later
@@ -90,8 +135,30 @@ async function sendStealth(V, K, value, tokenAddr) {
     console.log("Receipt: ", receipt);
 }
 
+async function calculatePrivateKey(R, v, k) {
+    const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
+    
+    let S = secp.getSharedSecret(v, R);
+    let hashS = ethers.sha256(S).substring(2);
+    console.log({ hashS });
+    console.log({ hashSPutaG: secp.getPublicKey(hashS) });
+    let s_num = secp.etc.bytesToNumberBE(hashS);
+    let k_num = secp.etc.bytesToNumberBE(secp.etc.hexToBytes(k));
+
+    s_num = secp.etc.mod(s_num, N);
+    let p = secp.etc.mod(s_num + k_num, N);
+    // console.log({ p });
+
+    let P = secp.getPublicKey(p);
+    console.log({ P: uint8ArrayToHex(P) })
+    let stealthAddr = uint8ArrayToHex(P).slice(0, 40);
+    console.log({ stealthAddr });
+
+    return { addr: stealthAddr, privKey: uint8ArrayToHex(secp.etc.numberToBytesBE(p)) };
+}
+
 
 // secp.getSharedSecret(r, alicesPubkey);
 
 
-export { generateMetaStealthAddr, sendStealth };
+export { generateMetaStealthAddr, sendStealth, calculatePrivateKey, generateMetaAddressKeys };
