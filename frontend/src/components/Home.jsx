@@ -20,7 +20,7 @@ const Home = ({ signature, setSignature }) => {
       <div className={styles.home}>
         <h2>Home</h2>
         <p>Generate your meta-stealth address and publish it on the blockchain</p>
-        <div className={styles.generateButton} onClick={() => generateMetaStealthAddr()}>Generate</div>
+        <div className={styles.generateButton} onClick={generate}>Generate</div>
       </div>
     </div>
   )
