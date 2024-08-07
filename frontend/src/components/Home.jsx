@@ -11,7 +11,7 @@ const Home = ({ signature, setSignature }) => {
     console.log("performGenerating");
     let { v, k } = generateMetaAddressKeys(signature);
     console.log({v, k});
-    generateMetaStealthAddr(v, k, amount, token)
+    generateMetaStealthAddr(k, v);
   }
 
   return (
