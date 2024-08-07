@@ -2,6 +2,7 @@
 pragma solidity 0.8.26;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract StealthAddress {
 
@@ -17,6 +18,8 @@ contract StealthAddress {
     
     error StealthAddress__BadBaseAddress();
     error StealthAddress__BadPublicKey();
+    error StealthAddress__InsufficientAllowence();
+    error StealthAddress__FailedRecievingToken();
 
     function registerMetaAddress(MetaAddress calldata metaAddress) public {
         metaAddressRegistry[msg.sender] = metaAddress;
@@ -43,8 +46,8 @@ contract StealthAddress {
         return metaAddressRegistry[baseAddress];
     }
 
-    //function that sets publick key addresses in array 
-    function publishEphPubKey(uint256 publicKey) public {
+    //function that sets publick key addresses in array (the function is internal because it will be used by sendEthToStealthAddr and sendTokenToStealthAddr)
+    function publishEphPubKey(uint256 publicKey) internal {
         if (publicKey == 0) {
             revert StealthAddress__BadPublicKey();
         }
@@ -58,5 +61,30 @@ contract StealthAddress {
             allEPH[i] = ephPubKeyRegistry[i];
         }
         return allEPH;
+    }
+
+    // function that sends ETH to given stealth address
+    function sendEthToStealthAddr(uint ephPubKey, address payable stealthAddr) public payable {
+        stealthAddr.call{value: msg.value}("");
+
+        publishEphPubKey(ephPubKey);
+        console.log("Sent %d wei to stealth address %s", msg.value, stealthAddr);
+    }
+
+    // function that sends ERC20 tokens to given stealth address
+    function sendTokenToStealthAddr(uint ephPubKey, address stealthAddr, address token, uint amount) public {
+
+        IERC20 paymentToken = IERC20(token);
+        if(paymentToken.allowance(msg.sender, address(this)) < amount) {
+            revert StealthAddress__InsufficientAllowence();
+        }
+        if(!paymentToken.transferFrom(msg.sender, address(this), amount)) {
+            revert StealthAddress__FailedRecievingToken();
+        }
+
+        paymentToken.transfer(stealthAddr, amount);
+        
+        publishEphPubKey(ephPubKey);
+        console.log("Sent %d tokens to stealth address %s", amount, stealthAddr);
     }
 }
