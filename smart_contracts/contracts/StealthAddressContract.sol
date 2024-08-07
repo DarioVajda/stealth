@@ -20,6 +20,7 @@ contract StealthAddress {
     error StealthAddress__BadPublicKey();
     error StealthAddress__InsufficientAllowence();
     error StealthAddress__FailedRecievingToken();
+    error StealthAddress__FailedSendingEth();
 
     function registerMetaAddress(MetaAddress calldata metaAddress) public {
         metaAddressRegistry[msg.sender] = metaAddress;
@@ -65,7 +66,10 @@ contract StealthAddress {
 
     // function that sends ETH to given stealth address
     function sendEthToStealthAddr(uint ephPubKey, address payable stealthAddr) public payable {
-        stealthAddr.call{value: msg.value}("");
+        (bool success, ) = stealthAddr.call{value: msg.value}("");
+        if(!success) {
+            revert StealthAddress__FailedSendingEth();
+        }
 
         publishEphPubKey(ephPubKey);
         console.log("Sent %d wei to stealth address %s", msg.value, stealthAddr);
