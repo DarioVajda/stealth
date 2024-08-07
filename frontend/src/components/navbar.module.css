@@ -1,0 +1,38 @@
+.navBar {
+    height: 5rem;
+    background-color: lightblue;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    /* border: 1px solid red; */
+}
+
+.navBar>* {
+    all: unset;
+    font-size: 1.5rem;
+    margin-right: 1em;
+    margin-left: 1em;
+    font-weight: 600;
+}
+.navBar>*:hover {
+    cursor: pointer;
+    color: rgb(53, 53, 53);
+}
+.navBar>p {
+    font-size: 2rem;
+    margin-right: 2em;
+}
+.paddingDiv {
+    flex: 1;
+}
+
+.login {
+    justify-self: end;
+    /* border: 1px solid blue; */
+    margin-right: 2em;
+}

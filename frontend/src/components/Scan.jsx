@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Scan = () => {
+const Scan = ({ signature, setSignature }) => {
   return (
     <div>Scan</div>
   )

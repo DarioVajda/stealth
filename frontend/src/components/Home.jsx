@@ -1,19 +1,18 @@
 import React from 'react'
 
-import { Link } from 'react-router-dom'
+import NavBar from './NavBar'
 import { generateMetaStealthAddr } from '../logic/logic'
 
-const Home = () => {
+import styles from './home.module.css'
+
+const Home = ({ signature, setSignature }) => {
   return (
     <div>
-      <div>
-        <li><Link to="/send">Send</Link></li>
-        <li><Link to="/scan">Scan</Link></li>
-      </div>
-      <div>
+      <NavBar signature={signature} setSignature={setSignature} />
+      <div className={styles.home}>
         <h2>Home</h2>
         <p>Generate your meta-stealth address and publish it on the blockchain</p>
-        <input type="button" value="Generate" onClick={() => generateMetaStealthAddr()} />
+        <div className={styles.generateButton} onClick={() => generateMetaStealthAddr()}>Generate</div>
       </div>
     </div>
   )
