@@ -7,13 +7,13 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract StealthAddress {
 
     struct MetaAddress {
-        uint256 publicSpendingKey;       // K
-        uint256 publicViewingKey;        // V
+        bytes publicSpendingKey;       // K
+        bytes publicViewingKey;        // V
     }
 
     uint ephCounter;
 
-    mapping(uint256 => uint256) ephPubKeyRegistry;
+    mapping(uint256 => bytes) ephPubKeyRegistry;
     mapping(address => MetaAddress) metaAddressRegistry;
     
     error StealthAddress__BadBaseAddress();
@@ -27,39 +27,51 @@ contract StealthAddress {
         metaAddressRegistry[msg.sender] = metaAddress;
         
         // for testing
-        console.log(
-            "Recieved meta address with following keys:\n%d\n%d\n", 
-            metaAddress.publicSpendingKey, 
-            metaAddress.publicViewingKey
-        );
+        // console.log(
+        //     "Recieved meta address with following keys:\n%d\n%d\n", 
+        //     metaAddress.publicSpendingKey, 
+        //     metaAddress.publicViewingKey
+        // );
         metaAddressRegistry[msg.sender] = metaAddress;
+    }
+
+    function areAllBytesZero(bytes memory data) internal pure returns(bool){
+        for (uint256 i =0 ; i < data.length; i++) {
+            if (data[i] != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // function for finding meta address given an existing ETH address
     function findMetaAddress(address baseAddress) public view returns (MetaAddress memory) {
-        if (metaAddressRegistry[baseAddress].publicSpendingKey == 0 && metaAddressRegistry[baseAddress].publicViewingKey == 0) {
+        if (
+            areAllBytesZero(metaAddressRegistry[baseAddress].publicSpendingKey) && 
+            areAllBytesZero(metaAddressRegistry[baseAddress].publicViewingKey)
+        ) {
             revert StealthAddress__BadBaseAddress();
         }
 
         // for testing
-        console.log("Meta-address for the given address is:\n%d\n%d\n",
-            metaAddressRegistry[baseAddress].publicSpendingKey, 
-            metaAddressRegistry[baseAddress].publicViewingKey
-        );
+        // console.log("Meta-address for the given address is:\n%d\n%d\n",
+        //     metaAddressRegistry[baseAddress].publicSpendingKey, 
+        //     metaAddressRegistry[baseAddress].publicViewingKey
+        // );
         return metaAddressRegistry[baseAddress];
     }
 
     // function that adds ephemeral pubkey to the registry
-    function publishEphPubKey(uint256 publicKey) internal {
-        if (publicKey == 0) {
+    function publishEphPubKey(bytes calldata publicKey) internal {
+        if (areAllBytesZero(publicKey)) {
             revert StealthAddress__BadPublicKey();
         }
         ephPubKeyRegistry[ephCounter++] = publicKey;
     }
     
     // fucntion that returns all ephemeral pubkeys found in the registry
-    function getAllEphPubKeys() public view returns(uint256[] memory){
-        uint256[] memory allEPH = new uint256[](ephCounter);
+    function getAllEphPubKeys() public view returns(bytes[] memory){
+        bytes[] memory allEPH = new bytes[](ephCounter);
         for(uint i = 0; i < ephCounter; i++){
             allEPH[i] = ephPubKeyRegistry[i];
         }
@@ -67,7 +79,7 @@ contract StealthAddress {
     }
 
     // function that sends ETH to given stealth address
-    function sendEthToStealthAddr(uint ephPubKey, address payable stealthAddr) public payable {
+    function sendEthToStealthAddr(bytes calldata ephPubKey, address payable stealthAddr) public payable {
         (bool success, ) = stealthAddr.call{value: msg.value}("");
         if(!success) {
             revert StealthAddress__FailedSendingEth();
@@ -78,7 +90,7 @@ contract StealthAddress {
     }
 
     // function that sends ERC20 tokens to given stealth address
-    function sendTokenToStealthAddr(uint ephPubKey, address stealthAddr, address token, uint amount) public {
+    function sendTokenToStealthAddr(bytes calldata ephPubKey, address stealthAddr, address token, uint amount) public {
 
         IERC20 paymentToken = IERC20(token);
         if(paymentToken.allowance(msg.sender, address(this)) < amount) {

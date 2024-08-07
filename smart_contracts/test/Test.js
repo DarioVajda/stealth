@@ -7,13 +7,20 @@ describe("StealthAddress", function () {
     const deployedContract = await ethers.deployContract("StealthAddress");
 
     const metaAddress = {
-      publicSpendingKey: "0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319",
-      publicViewingKey:"0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319"
+      publicSpendingKey: "0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b91424631921",
+      publicViewingKey:"0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319fd"
     }
     const address = "0xae4cee3b469acdcfcc104df565dcdc78e625f15b";
 
     await deployedContract.registerMetaAddress(metaAddress);
-    await deployedContract.findMetaAddress(owner);
+    let res = await deployedContract.findMetaAddress(owner);
+    res = {
+      publicSpendingKey: res[0],
+      publicViewingKey: res[1] 
+    }
+    console.log("Returned: ", res, typeof res);
+    expect(true).to.equal(metaAddress.publicSpendingKey == res.publicSpendingKey 
+        && metaAddress.publicViewingKey == res.publicViewingKey);
   });
   it("Testing sending ETH to stealth address", async function () {
     const [owner] = await ethers.getSigners();
@@ -22,7 +29,7 @@ describe("StealthAddress", function () {
     // defining the arguments for the test
     const amount = '1200000000000000000'; // 1.2 ether
     const addr = '0xae4cee3b469acdcfcc104df565dcdc78e625f15b';
-    const dummyKey ='0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319'; 
+    const dummyKey ='0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319d2'; 
 
     // sending the ether to the stealth address
     await stealthContract.sendEthToStealthAddr(
@@ -52,7 +59,7 @@ describe("StealthAddress", function () {
     // defining the arguments for the test
     const amount = '1200000000000000000'; // 1.2 ether
     const addr = '0xae4cee3b469acdcfcc104df565dcdc78e625f15b';
-    const dummyKey = '0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319';
+    const dummyKey = '0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319ab';
 
     // minting new tokens for the sender (for test purpoces)
     await tokenContract.mint(sender.address, amount);
