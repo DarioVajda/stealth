@@ -17,3 +17,6 @@ smart_contracts/coverage.json
 
 # Hardhat Ignition default folder for deployments against a local node
 smart_contracts/ignition/deployments/chain-31337
+
+# VS Code files
+.vscode
