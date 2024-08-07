@@ -1,8 +1,11 @@
 import * as secp from '@noble/secp256k1';
 import { ethers } from 'ethers';
 
+import contractJson from './StealthAddress.json';
+const contractAbi = contractJson.abi;
+
 function uint8ArrayToHex(uint8Array) {
-    return Array.from(uint8Array)
+    return '0x' + Array.from(uint8Array)
         .map(byte => byte.toString(16).padStart(2, '0'))
         .join('');
 }
@@ -17,21 +20,29 @@ async function generateMetaStealthAddr() {
     let V = secp.getPublicKey(v);
 
 
-    // #region temporary
+    console.log({K, V});
     console.log({ K: uint8ArrayToHex(K), V: uint8ArrayToHex(V) });
-    return { K, V };
-    // #endregion
+    // return { K, V };
 
 
     // implement calling the contract to publish the meta-stealth address
     let provider = new ethers.BrowserProvider(window.ethereum);
+    let signer = await provider.getSigner(0);
+
     let stealthContract = new ethers.Contract(
-        '0x...', // address of the contract to be added later
-        'smartContract.Abi', // the ABI of the smart contract
-        provider.getSigner(0)
+        '0xAea2d2644f2dB6542CEF21bb3B502d0326282A93', // address of the contract to be added later
+        contractAbi, // the ABI of the smart contract
+        signer
     );
 
-    const tx = await stealthContract.stealthSetup(K, V); // calling the function of the contract
+    // TODO promeniti argumente u smart contractu da ne bude struktura nego posebno brojevi, a onda tamo da se napravi struktura
+    const tx = await stealthContract.registerMetaAddress({
+        // publicSpendingKey: uint8ArrayToHex(K),
+        // publicViewingKey: uint8ArrayToHex(V)
+        publicSpendingKey: '0x034c863d4641925a7e56192cc9cca73df9225fe07efd2f038e3a76e4fe818e9369',
+        publicViewingKey: "0x023e16f66bd047e0ba4b090d3782b3051ba0eb0cd77a03ba4ca88573b001d3718b"
+    }); // calling the function of the contract
+
     console.log("Transaction hash: ", tx.hash);
     const receipt = await tx.wait(); // waiting for the transaction to be performed
     console.log("Receipt: ", receipt);
@@ -70,7 +81,7 @@ async function sendStealth(V, K, value, tokenAddr) {
     );
 
     let tx;
-    if(token == 0) {
+    if(tokenAddr === 0) {
         tx = await stealthContract.sendEthToStealthAddr(R, stealthAddr, { value: value }); // calling the function of the contract
     }
     else {
