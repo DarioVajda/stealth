@@ -30,17 +30,15 @@ async function generateMetaStealthAddr() {
     let signer = await provider.getSigner(0);
 
     let stealthContract = new ethers.Contract(
-        '0xAea2d2644f2dB6542CEF21bb3B502d0326282A93', // address of the contract to be added later
+        '0x2ca6D993651d967a00d494D8d059b14AFD895Aa2', // address of the contract to be added later
         contractAbi, // the ABI of the smart contract
         signer
     );
 
     // TODO promeniti argumente u smart contractu da ne bude struktura nego posebno brojevi, a onda tamo da se napravi struktura
     const tx = await stealthContract.registerMetaAddress({
-        // publicSpendingKey: uint8ArrayToHex(K),
-        // publicViewingKey: uint8ArrayToHex(V)
-        publicSpendingKey: '0x034c863d4641925a7e56192cc9cca73df9225fe07efd2f038e3a76e4fe818e9369',
-        publicViewingKey: "0x023e16f66bd047e0ba4b090d3782b3051ba0eb0cd77a03ba4ca88573b001d3718b"
+        publicSpendingKey: "0x034c863d4641925a7e56192cc9cca73df9225fe07efd2f038e3a76e4fe818e9369",
+        publicViewingKey: "0x023e16f66bd047e0ba4b090d3782b3051ba0eb0cd77a03ba4ca88573b001d3718b",
     }); // calling the function of the contract
 
     console.log("Transaction hash: ", tx.hash);
