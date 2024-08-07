@@ -76,6 +76,7 @@ describe("StealthAddress", function () {
 
     // check if the EphPubKey was published
     const ephPubKeys = await stealthContract.getAllEphPubKeys();
+    console.log("Lista: ", ephPubKeys);
     ephPubKeys.forEach(element => {
       expect(element).to.equal(dummyKey);
     });
@@ -84,4 +85,18 @@ describe("StealthAddress", function () {
     const tokenBalance = await tokenContract.balanceOf(addr);
     expect(tokenBalance).to.equal(amount);
   })
+  /* it("Testing scanning for eph pubkeys", async function () {
+    const stealthContract = await ethers.deployContract("StealthAddress");
+
+    const dummyKey = "0x0c656e5332403213ecee5406acd97dd7f4adea786235d8c7e9edcbc7fddd66af83";
+
+    await stealthContract.publishEphPubKey(dummyKey);
+    let pubKeysList = await stealthContract.getAllEphPubKeys();
+    console.log("PubKeys list: ", pubKeysList);
+
+    await stealthContract.publishEphPubKey(dummyKey);
+    await stealthContract.publishEphPubKey(dummyKey);
+    pubKeysList = await stealthContract.getAllEphPubKeys();
+    console.log("PubKeys list: ", pubKeysList, typeof pubKeysList);
+  }); */
 });
