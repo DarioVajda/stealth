@@ -50,10 +50,6 @@ async function generateMetaStealthAddr(k, v) {
     let V = secp.getPublicKey(v.substring(2));
 
 
-    console.log({ k, v, K, V });
-    console.log({ K: uint8ArrayToHex(K), V: uint8ArrayToHex(V), k: uint8ArrayToHex(k), v: uint8ArrayToHex(v) });
-
-
     // TODO make sure the code below works
     // implement calling the contract to publish the meta-stealth address
     let provider = new ethers.BrowserProvider(window.ethereum);
@@ -65,6 +61,7 @@ async function generateMetaStealthAddr(k, v) {
         signer
     );
 
+    console.log("Sending to contract values", uint8ArrayToHex(K), uint8ArrayToHex(V));
     const tx = await stealthContract.registerMetaAddress({
         publicSpendingKey: uint8ArrayToHex(K),
         publicViewingKey: uint8ArrayToHex(V),
@@ -137,6 +134,19 @@ async function sendStealth(v, k, value, tokenAddr) {
 
 async function fetchPublicKeys(address) {
     // fetch the public keys from the contract
+
+    let provider = new ethers.BrowserProvider(window.ethereum);
+    let signer = await provider.getSigner(0);
+
+    let stealthContract = new ethers.Contract(
+        '0x2ca6D993651d967a00d494D8d059b14AFD895Aa2', // address of the contract to be added later
+        contractAbi, // the ABI of the smart contract
+        signer
+    );
+
+    let metaAddress = await stealthContract.findMetaAddress(address);
+    console.log(metaAddress);
+
     return {
         V: '0x...',
         K: '0x...'

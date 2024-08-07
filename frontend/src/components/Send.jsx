@@ -21,11 +21,11 @@ const Send = ({ signature, setSignature }) => {
     setToken(event.target.value);
   }
 
-  const performSend = () => {
+  const performSend = async () => {
     console.log("performSend")
 
-    let { V, K } = fetchPublicKeys(to);
-    sendStealth(v, k, amount, token)
+    let { V, K } = await fetchPublicKeys(to);
+    sendStealth(V, K, amount, token)
   }
 
   return (
