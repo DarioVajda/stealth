@@ -18,7 +18,7 @@ const NavBar = ({ signature, setSignature }) => {
   return (
     <div className={styles.navBar}>
       <p>Ninjas 🥷🏻</p>
-      <Link to="/">Sign Up</Link>
+      <Link to="/">Generate</Link>
       <Link to="/send">Send</Link>
       <Link to="/scan">Scan</Link>
       <div className={styles.paddingDiv}/>
