@@ -23,6 +23,8 @@ contract StealthAddress {
     error StealthAddress__FailedRecievingToken();
     error StealthAddress__FailedSendingEth();
 
+    event StealthAddress__PublishedEphPubKey(uint256 indexed count);
+
     // function for registering a meta address in meta address registry
     function registerMetaAddress(MetaAddress calldata metaAddress) public {
         metaAddressRegistry[msg.sender] = metaAddress;
@@ -63,11 +65,12 @@ contract StealthAddress {
     }
 
     // function that adds ephemeral pubkey to the registry
-    function publishEphPubKey(bytes calldata publicKey) public {
+    function publishEphPubKey(bytes calldata publicKey) internal {
         if (areAllBytesZero(publicKey)) {
             revert StealthAddress__BadPublicKey();
         }
         ephPubKeyRegistry[ephCounter++] = publicKey;
+        emit StealthAddress__PublishedEphPubKey(ephCounter);
     }
     
     // fucntion that returns all ephemeral pubkeys found in the registry
@@ -84,7 +87,6 @@ contract StealthAddress {
         bytes[] memory newEPH = new bytes[](ephCounter - startIndex);
         for (uint i = startIndex; i < ephCounter; i++){
             newEPH[i - startIndex] = ephPubKeyRegistry[i];
-            console.log(i);
         }
         return newEPH;
     }

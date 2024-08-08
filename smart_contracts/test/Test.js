@@ -86,17 +86,38 @@ describe("StealthAddress", function () {
     expect(tokenBalance).to.equal(amount);
   })
   it("Testing scanning for eph pubkeys", async function () {
+    const [owner] = await ethers.getSigners();
     const stealthContract = await ethers.deployContract("StealthAddress");
 
-    const dummyKey = "0x0c656e5332403213ecee5406acd97dd7f4adea786235d8c7e9edcbc7fddd66af83";
+    // defining the arguments for the test
+    const amount = '1200000000000000000'; // 1.2 ether
+    const addr = '0xae4cee3b469acdcfcc104df565dcdc78e625f15b';
+    const dummyKey1 ='0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319d2'; 
+    const dummyKey2 ='0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319d2'; 
+    const dummyKey3 ='0x51897b64e85c3f714bba707e867914295a1377a7463a9dae8ea6a8b914246319d2'; 
 
-    await stealthContract.publishEphPubKey(dummyKey);
-    let pubKeysList = await stealthContract.getNewPubKeys(0);
-    console.log("PubKeys list: ", pubKeysList);
+    // sending some ether, so that eph pubkeys get published to the registry
+    await stealthContract.sendEthToStealthAddr(
+      dummyKey1,
+      addr,
+      { value: amount }
+    );
 
-    await stealthContract.publishEphPubKey(dummyKey);
-    await stealthContract.publishEphPubKey(dummyKey);
-    pubKeysList = await stealthContract.getNewPubKeys(1);
-    console.log("PubKeys list: ", pubKeysList, typeof pubKeysList);
+    let ephPubKeys = await stealthContract.getNewPubKeys(0); 
+    console.log("Current ephPubKeys: ", ephPubKeys);
+
+    await stealthContract.sendEthToStealthAddr(
+      dummyKey2,
+      addr,
+      { value: amount }
+    );
+    await stealthContract.sendEthToStealthAddr(
+      dummyKey3,
+      addr,
+      { value: amount }
+    );
+
+    ephPubKeys = await stealthContract.getNewPubKeys(1); 
+    console.log("Current ephPubKeys: ", ephPubKeys);
   }); 
 });
