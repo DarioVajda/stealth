@@ -16,6 +16,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 0.5em;
 
     /* border: 1px solid red; */
     border-radius: 20px;
