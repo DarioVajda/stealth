@@ -1,5 +1,31 @@
+.wrapper {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 14em;
+}
+
 .home {
-    padding-top: 5rem;
+    width: min(80vw, 60em);
+    height: 70vh;
+    /* outline: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.home>h2 {
+    font-size: 3rem;
+    margin-bottom: 1em;
+}
+
+.home>p {
+    font-size: 1.5rem;
+    padding-left: 5em;
+    padding-right: 5em;
+    text-align: center;
 }
 
 .generateButton {
@@ -8,6 +34,8 @@
     padding-bottom: .3em;
     padding-right: 1.5em;
     padding-left: 1.5em;
+
+    text-align: center;
 
     /* border: 1px solid red; */
     border-radius: 20px;

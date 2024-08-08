@@ -15,6 +15,9 @@ const Scan = ({ signature, setSignature }) => {
   const [ wallets, setWallets ] = React.useState([]);
 
   const pullWalletBalances = async () => {
+    if(!signature) return;
+
+    
     // loading the ephemeral keys
     let ephKeys = await fetchEphermalKeys();
 
@@ -68,6 +71,12 @@ const Scan = ({ signature, setSignature }) => {
       <NavBar signature={signature} setSignature={setSignature} />
       <div className={styles.scan}>
         <div className={styles.scanBtn} onClick={pullWalletBalances}>Scan</div>
+        {
+          !signature &&
+          <p>
+            Log in to generate your meta-stealth address
+          </p>
+        }
         <div className={styles.wallets}>{
           wallets.filter(value => value.balance).map((wallet, index) => (
               <div key={index} className={styles.wallet}>

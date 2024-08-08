@@ -27,6 +27,7 @@ function generateMetaAddressKeys(signature) {
     const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
 
     // removing the 0x from the beginning
+    console.log({signature});
     signature = signature.substring(2)
 
     // splitting the signature into two seeds

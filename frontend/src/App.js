@@ -8,7 +8,7 @@ import Scan from './components/Scan';
 
 function App() {
 
-  const [ signature, setSignature ] = useState('signature_initial');
+  const [ signature, setSignature ] = useState();
 
   return (
     <BrowserRouter>

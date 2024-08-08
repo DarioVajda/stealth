@@ -7,8 +7,13 @@
     /* border: 1px solid red; */
 }
 
-.scanBtn {
+.scan>p {
     font-size: 2rem;
+    margin-bottom: 1em;
+}
+
+.scanBtn {
+    font-size: 2.5rem;
     padding-top: .3em;
     padding-bottom: .3em;
     padding-right: 1.5em;
