@@ -176,8 +176,22 @@ async function calculatePrivateKey(R, v, k) {
     return { addr: stealthAddr, privKey: uint8ArrayToHex(secp.etc.numberToBytesBE(p)) };
 }
 
+/**
+*   Fetch all ephemeral pubkeys from the registry stored on the smart contract
+*/
 async function fetchEphermalKeys() {
-    return ['...'];
+    let provider = new ethers.BrowserProvider(window.ethereum);
+    let signer = await provider.getSigner(0);
+
+    let stealthContract = new ethers.Contract(
+        '0x2ca6D993651d967a00d494D8d059b14AFD895Aa2', // address of the contract to be added later
+        contractAbi, // the ABI of the smart contract
+        signer
+    );
+
+    let ephPubKeys = await stealthContract.getAllEphPubKeys();
+    console.log(ephPubKeys);
+    return ephPubKeys;
 }
 
 
