@@ -154,13 +154,18 @@ async function fetchPublicKeys(address) {
     };
 }
 
-async function calculatePrivateKey(R, v, k) {
+function calculatePrivateKey(R, v, k) {
     const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
+
+    R = R.substring(2);
+    v = v.substring(2);
+    k = k.substring(2);
+    // console.log({ R, v, k });
     
     let S = secp.getSharedSecret(v, R);
     let hashS = ethers.sha256(S).substring(2);
-    console.log({ hashS });
-    console.log({ hashSPutaG: secp.getPublicKey(hashS) });
+    // console.log({ hashS });
+    // console.log({ hashSPutaG: secp.getPublicKey(hashS) });
     let s_num = secp.etc.bytesToNumberBE(hashS);
     let k_num = secp.etc.bytesToNumberBE(secp.etc.hexToBytes(k));
 
@@ -169,9 +174,9 @@ async function calculatePrivateKey(R, v, k) {
     // console.log({ p });
 
     let P = secp.getPublicKey(p);
-    console.log({ P: uint8ArrayToHex(P) })
-    let stealthAddr = uint8ArrayToHex(P).slice(0, 40);
-    console.log({ stealthAddr });
+    // console.log({ P: uint8ArrayToHex(P) })
+    let stealthAddr = uint8ArrayToHex(P).slice(0, 42);
+    // console.log({ stealthAddr });
 
     return { addr: stealthAddr, privKey: uint8ArrayToHex(secp.etc.numberToBytesBE(p)) };
 }
@@ -190,7 +195,9 @@ async function fetchEphermalKeys() {
     );
 
     let ephPubKeys = await stealthContract.getAllEphPubKeys();
-    console.log(ephPubKeys);
+    // console.log(ephPubKeys);
+    ephPubKeys = JSON.parse(JSON.stringify(ephPubKeys))
+    // console.log(ephPubKeys);
     return ephPubKeys;
 }
 
