@@ -1,4 +1,5 @@
 import React from 'react'
+import BigNumber from 'bignumber.js';
 
 import { fetchEphermalKeys, calculatePrivateKey, generateMetaAddressKeys } from '../logic/logic'
 import { checkBalance } from '../logic/blockchain';
@@ -17,7 +18,7 @@ const Scan = ({ signature, setSignature }) => {
   const pullWalletBalances = async () => {
     if(!signature) return;
 
-    
+
     // loading the ephemeral keys
     let ephKeys = await fetchEphermalKeys();
 
@@ -64,6 +65,12 @@ const Scan = ({ signature, setSignature }) => {
       });
   };
 
+  const weiToEth = (weiString) => {
+    const wei = new BigNumber(weiString);
+    const eth = wei.dividedBy(new BigNumber('1e18'));
+    return eth.toFixed(); // Convert to string with precision
+  };
+
   console.log(wallets);
 
   return (
@@ -87,7 +94,7 @@ const Scan = ({ signature, setSignature }) => {
                   <span>Private key:</span>
                   <p onClick={() => handleCopy(wallet.privKey)}>{wallet.privKey.substring(0, 10)}...</p>
                   <span>Balance:</span>
-                  <p>{`${wallet.balance}`} WEI</p>
+                  <p>{weiToEth(`${wallet.balance}`)} ETH</p>
                 </div>
               </div>
           ))

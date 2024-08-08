@@ -33,3 +33,25 @@
 .sendButton:active {
     box-shadow: none;
 }
+
+
+
+.addrInput {
+    width: 25em;
+    font-size: 1.3rem;
+    padding: .4em;
+    margin-top: .5em;
+    border-radius: 10px;
+    border: 2px solid rgb(77, 148, 255);
+    text-align: center;
+}
+
+.valueInput {
+    width: 10em;
+    font-size: 1.7rem;
+    padding: .2em;
+    margin-top: .5em;
+    border-radius: 10px;
+    border: 2px solid rgb(77, 148, 255);
+    text-align: center;
+}
