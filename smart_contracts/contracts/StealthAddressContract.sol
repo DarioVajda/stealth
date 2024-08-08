@@ -63,7 +63,7 @@ contract StealthAddress {
     }
 
     // function that adds ephemeral pubkey to the registry
-    function publishEphPubKey(bytes calldata publicKey) internal {
+    function publishEphPubKey(bytes calldata publicKey) public {
         if (areAllBytesZero(publicKey)) {
             revert StealthAddress__BadPublicKey();
         }
@@ -79,27 +79,15 @@ contract StealthAddress {
         return allEPH;
     }
 
-    /* to be implemented...
-    function updateLastIndex(uint index) internal {
-        lastIndexes[msg.sender] = index;
+    // fucntion that returns all ephemeral pubkeys found in the registry
+    function getNewPubKeys(uint startIndex) public view returns(bytes[] memory) {
+        bytes[] memory newEPH = new bytes[](ephCounter - startIndex);
+        for (uint i = startIndex; i < ephCounter; i++){
+            newEPH[i - startIndex] = ephPubKeyRegistry[i];
+            console.log(i);
+        }
+        return newEPH;
     }
-
-       // fucntion that returns all ephemeral pubkeys found in the registry
-    function getNewPubKeys() public view returns(bytes[] memory) {
-        uint newKeysCount = ephCounter;
-        if (lastIndexes[msg.sender] != 0) {
-            newKeysCount -= lastIndexes[msg.sender];
-        }
-        bytes[] memory newEPH = new bytes[](newKeysCount);
-
-        for (uint i = lastIndexes[msg.sender] + 1; i < ephCounter; i++) {
-            newEPH[i] = ephPubKeyRegistry[lastIndexes[msg.sender] + i];
-        }
-
-        lastIndexes[msg.sender] = ephCounter - 1;
-
-        return (newEPH, index);
-    } */
 
     // function that sends ETH to given stealth address
     function sendEthToStealthAddr(bytes calldata ephPubKey, address payable stealthAddr) public payable {

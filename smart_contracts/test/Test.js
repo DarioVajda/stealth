@@ -85,18 +85,18 @@ describe("StealthAddress", function () {
     const tokenBalance = await tokenContract.balanceOf(addr);
     expect(tokenBalance).to.equal(amount);
   })
-  /* it("Testing scanning for eph pubkeys", async function () {
+  it("Testing scanning for eph pubkeys", async function () {
     const stealthContract = await ethers.deployContract("StealthAddress");
 
     const dummyKey = "0x0c656e5332403213ecee5406acd97dd7f4adea786235d8c7e9edcbc7fddd66af83";
 
     await stealthContract.publishEphPubKey(dummyKey);
-    let pubKeysList = await stealthContract.getAllEphPubKeys();
+    let pubKeysList = await stealthContract.getNewPubKeys(0);
     console.log("PubKeys list: ", pubKeysList);
 
     await stealthContract.publishEphPubKey(dummyKey);
     await stealthContract.publishEphPubKey(dummyKey);
-    pubKeysList = await stealthContract.getAllEphPubKeys();
+    pubKeysList = await stealthContract.getNewPubKeys(1);
     console.log("PubKeys list: ", pubKeysList, typeof pubKeysList);
-  }); */
+  }); 
 });
