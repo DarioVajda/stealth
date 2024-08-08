@@ -1,6 +1,6 @@
 .navBar {
     height: 5rem;
-    background-color: lightblue;
+    background-color: rgb(77, 148, 255);
     display: flex;
     flex-direction: row;
     justify-content: start;

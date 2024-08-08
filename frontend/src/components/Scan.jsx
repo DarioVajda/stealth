@@ -50,6 +50,17 @@ const Scan = ({ signature, setSignature }) => {
     // console.log("wallets: ", wallets);
   }
 
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        console.log('Hex copied to clipboard!');
+        alert('Hex copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Error copying to clipboard: ', err);
+      });
+  };
+
   console.log(wallets);
 
   return (
@@ -58,13 +69,17 @@ const Scan = ({ signature, setSignature }) => {
       <div className={styles.scan}>
         <div className={styles.scanBtn} onClick={pullWalletBalances}>Scan</div>
         <div className={styles.wallets}>{
-          wallets.map((wallet, index) => (
-              wallet.balance &&
+          wallets.filter(value => value.balance).map((wallet, index) => (
               <div key={index} className={styles.wallet}>
-                <p>Wallet</p>
-                <p>{wallet.address}</p>
-                <p>{wallet.privKey}</p>
-                <p>{`${wallet.balance}`}</p>
+                <div>
+                  <p>Wallet #{index + 1}</p>
+                  <span>Address:</span>
+                  <p onClick={() => handleCopy(wallet.address)}>{wallet.address}</p>
+                  <span>Private key:</span>
+                  <p onClick={() => handleCopy(wallet.privKey)}>{wallet.privKey.substring(0, 10)}...</p>
+                  <span>Balance:</span>
+                  <p>{`${wallet.balance}`} WEI</p>
+                </div>
               </div>
           ))
         }</div>
