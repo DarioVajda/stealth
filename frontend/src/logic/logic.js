@@ -175,8 +175,12 @@ async function calculatePrivateKey(R, v, k) {
     return { addr: stealthAddr, privKey: uint8ArrayToHex(secp.etc.numberToBytesBE(p)) };
 }
 
+async function fetchEphermalKeys() {
+    return ['...'];
+}
+
 
 // secp.getSharedSecret(r, alicesPubkey);
 
 
-export { generateMetaStealthAddr, sendStealth, calculatePrivateKey, generateMetaAddressKeys, fetchPublicKeys };
+export { generateMetaStealthAddr, sendStealth, calculatePrivateKey, generateMetaAddressKeys, fetchPublicKeys, fetchEphermalKeys };
