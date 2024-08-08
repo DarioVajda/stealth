@@ -4,12 +4,25 @@ import { ethers } from 'ethers';
 import contractJson from './StealthAddress.json';
 const contractAbi = contractJson.abi;
 
+/**
+ * Convert an array of 32 uint8 numbers into one hex number represented as a string.
+ * 
+ * @param {int[]} uint8Array        array of 32 integers
+ * @returns                         hexadecimal number represented as a string (format: '0x...')
+ */
 function uint8ArrayToHex(uint8Array) {
     return '0x' + Array.from(uint8Array)
         .map(byte => byte.toString(16).padStart(2, '0'))
         .join('');
 }
 
+/**
+ * Generate private sepnding and viewing keys (k, v) needed for meta address generation.
+ * Keys are generated based on digital signature of some message.
+ * 
+ * @param {string} signature        digital signature of message given to user (used as seed for key generation)
+ * @returns {{string, string}}      private spending and viewing keys
+ */
 function generateMetaAddressKeys(signature) {
     const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
 
@@ -36,6 +49,8 @@ function generateMetaAddressKeys(signature) {
 }
 
 /**
+ * Generate meta address based on private spending and viewing keys. Meta address is of the form
+ * (K, V), where K and V are public spending and viewing keys respectively.
  * 
  * @param {String} k private spending key
  * @param {String} v private viewing key
@@ -73,9 +88,10 @@ async function generateMetaStealthAddr(k, v) {
 }
 
 /**
+ * Send ETH or ERC20 tokens to stealth address that is generated using public spending and viewing keys.
  * 
- * @param {String} v private viewing key
- * @param {String} k private spending key
+ * @param {String} V public viewing key
+ * @param {String} K public spending key
  * @param {Int} value value of the token to be sent
  * @param {Address} tokenAddr 0 for ether and the address of the token for ERC20 tokens otherwise
  */
@@ -131,6 +147,13 @@ async function sendStealth(V, K, value, tokenAddr, signature) {
     console.log("Receipt: ", receipt);
 }
 
+/**
+ * Fetch public spending and viewing keys (which together form meta address) associated with Ethereum account
+ * whose address is given as a parameter.
+ * 
+ * @param {Address} address         address of an Ethereum account
+ * @returns {{String, String}}      public keys (meta address) associated with the account in the hex form ('0x...')
+ */
 async function fetchPublicKeys(address) {
     // fetch the public keys from the contract
 
@@ -150,7 +173,14 @@ async function fetchPublicKeys(address) {
         V: metaAddress[1]
     };
 }
-
+/**
+ * Calculate private key and the stealth address using the given ephemeral pubkey.
+ * 
+ * @param {String} R        ephemeral pubkey
+ * @param {String} v        private viewing key
+ * @param {String} k        private spending key
+ * @returns                 stealth address and private key associated with it
+ */
 function calculatePrivateKey(R, v, k) {
     const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
 
@@ -182,6 +212,8 @@ function calculatePrivateKey(R, v, k) {
 
 /**
 *   Fetch all ephemeral pubkeys from the registry stored on the smart contract
+*
+*   @returns {String[]}         List of published ephemeral pubkeys on the contract
 */
 async function fetchEphermalKeys() {
     let provider = new ethers.BrowserProvider(window.ethereum);
