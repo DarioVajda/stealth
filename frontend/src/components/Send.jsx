@@ -25,7 +25,7 @@ const Send = ({ signature, setSignature }) => {
     console.log("performSend")
 
     let { V, K } = await fetchPublicKeys(to);
-    sendStealth(V, K, amount, token)
+    sendStealth(V, K, amount, token, signature)
   }
 
   return (

@@ -79,7 +79,7 @@ async function generateMetaStealthAddr(k, v) {
  * @param {Int} value value of the token to be sent
  * @param {Address} tokenAddr 0 for ether and the address of the token for ERC20 tokens otherwise
  */
-async function sendStealth(V, K, value, tokenAddr) {
+async function sendStealth(V, K, value, tokenAddr, signature) {
     const N = secp.etc.bytesToNumberBE(secp.etc.hexToBytes('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'));
 
 
@@ -104,13 +104,12 @@ async function sendStealth(V, K, value, tokenAddr) {
     let G_hashS = secp.ProjectivePoint.fromHex(G_hashS_Hex);
     let K_point = secp.ProjectivePoint.fromHex(K);
     let P_point = G_hashS.add(K_point);
-    let P_hex = P_point.toHex();
-    console.log({ P_hex });
-
-    let stealthAddr = '0x' + P_hex.slice(0, 40);
+    let P_hex = P_point.toHex(false);
+    let stealthAddr = '0x' + ethers.keccak256('0x' + P_hex.slice(2)).slice(-40);
     console.log({ stealthAddr });
 
-    // TODO make sure the code below works
+
+
     let provider = new ethers.BrowserProvider(window.ethereum);
     let signer = await provider.getSigner(0);
 
@@ -119,10 +118,8 @@ async function sendStealth(V, K, value, tokenAddr) {
         contractAbi,                                  // the ABI of the smart contract
         signer 
     );
-    console.log("Connected to smart contract");
 
     let tx;
-    console.log(tokenAddr == 0);
     if(tokenAddr == 0) {
         tx = await stealthContract.sendEthToStealthAddr(R, stealthAddr, { value: value }); // calling the function of the contract
     }
@@ -171,14 +168,16 @@ function calculatePrivateKey(R, v, k) {
 
     s_num = secp.etc.mod(s_num, N);
     let p = secp.etc.mod(s_num + k_num, N);
-    // console.log({ p });
+    p = secp.etc.bytesToHex(secp.etc.numberToBytesBE(p));
 
-    let P = secp.getPublicKey(p);
+    // let P = secp.getPublicKey(p);
     // console.log({ P: uint8ArrayToHex(P) })
-    let stealthAddr = uint8ArrayToHex(P).slice(0, 42);
-    // console.log({ stealthAddr });
 
-    return { addr: stealthAddr, privKey: uint8ArrayToHex(secp.etc.numberToBytesBE(p)) };
+    let stealthWallet = new ethers.Wallet(p);
+    let stealthAddr = stealthWallet.address;
+    console.log({ stealthAddr });
+
+    return { addr: stealthAddr, privKey: p };
 }
 
 /**

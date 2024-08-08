@@ -4,7 +4,7 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    border: 1px solid red;
+    /* border: 1px solid red; */
 }
 
 .scanBtn {
@@ -32,4 +32,19 @@
 }
 .scanBtn:active {
     box-shadow: none;
+}
+
+.wallets {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 2em;
+    border: 1px solid blue;
+}
+
+.wallet {
+    width: 50%;
+    height: 100%;
+    box-sizing: border-box;
+    border: 1px solid green;
 }

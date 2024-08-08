@@ -60,9 +60,10 @@ const Scan = ({ signature, setSignature }) => {
         <div className={styles.wallets}>{
           wallets.map((wallet, index) => (
               wallet.balance &&
-              <div key={index}>
+              <div key={index} className={styles.wallet}>
                 <p>Wallet</p>
                 <p>{wallet.address}</p>
+                <p>{wallet.privKey}</p>
                 <p>{`${wallet.balance}`}</p>
               </div>
           ))
